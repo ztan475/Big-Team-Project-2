@@ -10,7 +10,7 @@ public class PlayerMovement : MonoBehaviour
     public enum PlayerState
     {
         Idle,
-        Running,
+        Moving,
         Jumping,
         Falling
         // Add other states as needed
@@ -18,13 +18,13 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float frictionAmount = 0.2f;
+    [SerializeField] private PlayerState playerState;
 
     [Header("Jump Parameters")]
     [SerializeField] private float jumpForce = 10f;
     [SerializeField] private float coyoteTime = 0.1f;
     [SerializeField] private float jumpCutMultiplier = 0.5f;
-    [SerializeField] private float fallMultiplier = 2.5f;
+    [SerializeField] private float fallSpeed;
 
     [Header("Ground Detection")]
     [SerializeField] private Transform groundCheck;
@@ -35,15 +35,15 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private float moveInput;
     private float coyoteTimeCounter;
-    private PlayerState playerState = PlayerState.Idle;
     private Dictionary<string, Action> stateActions;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-
+        fallSpeed = (moveSpeed / 4);
         // Initialize the state actions dictionary
         InitializeStateActions();
+        StateCheck("Idle");
     }
 
     private void InitializeStateActions()
@@ -58,10 +58,10 @@ public class PlayerMovement : MonoBehaviour
             }},
             
             // Running state setup
-            { "Running", () => {
-                playerState = PlayerState.Running;
+            { "Moving", () => {
+                playerState = PlayerState.Moving;
                 // Any Running-specific animation goes here
-                Debug.Log("Player entered Running state");
+                Debug.Log("Player entered Moving state");
             }},
             
             // Jumping state setup
@@ -109,7 +109,7 @@ public class PlayerMovement : MonoBehaviour
             if ((playerState == PlayerState.Jumping || playerState == PlayerState.Falling) && rb.velocity.y <= 0)
             {
                 if (Mathf.Abs(moveInput) > 0.1f)
-                    StateCheck("Running");
+                    StateCheck("Moving");
                 else
                     StateCheck("Idle");
             }
@@ -122,6 +122,7 @@ public class PlayerMovement : MonoBehaviour
             if (playerState != PlayerState.Jumping && playerState != PlayerState.Falling)
             {
                 StateCheck("Falling");
+                rb.velocity = new Vector2(fallSpeed, rb.velocity.y);
             }
 
         }
@@ -131,21 +132,15 @@ public class PlayerMovement : MonoBehaviour
     {
         // Calculate target speed
         moveInput *= moveSpeed;
-
-        // Apply friction when not pressing movement keys
-        if (Mathf.Abs(moveInput) < 0.01f && IsGrounded())
-        {
-            float frictionForce = Mathf.Min(Mathf.Abs(rb.velocity.x), frictionAmount);
-            frictionForce *= Mathf.Sign(rb.velocity.x);
-            rb.AddForce(-frictionForce * Vector2.right, ForceMode2D.Impulse);
-        }
+        rb.velocity = new Vector2(moveInput, rb.velocity.y);
 
         // Update running state, player can only move if grounded
         if (IsGrounded())
         {
-            if (Mathf.Abs(rb.velocity.x) > 0.1f && playerState != PlayerState.Running)
+
+            if (Mathf.Abs(rb.velocity.x) > 0.1f && playerState != PlayerState.Moving)
             {
-                StateCheck("Running");
+                StateCheck("Moving");
             }
             else if (Mathf.Abs(rb.velocity.x) <= 0.1f && playerState != PlayerState.Idle)
             {
@@ -180,7 +175,7 @@ public class PlayerMovement : MonoBehaviour
         // Fall faster than jump for better feel
         if (rb.velocity.y < 0)
         {
-            rb.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
+            rb.velocity += Vector2.up * Physics2D.gravity.y * (fallSpeed - 1) * Time.deltaTime;
         }
     }
 
