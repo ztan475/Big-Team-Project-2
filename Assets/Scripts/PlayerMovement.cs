@@ -15,6 +15,8 @@ public class PlayerMovement : MonoBehaviour
         Falling
         // Add other states as needed
     }
+    [Header("Camera")]
+    [SerializeField] private Camera Camera;
 
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
@@ -23,7 +25,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Jump Parameters")]
     [SerializeField] private float jumpForce = 10f;
     [SerializeField] private float coyoteTime = 0.1f;
-    [SerializeField] private float jumpCutMultiplier = 0.5f;
+    [SerializeField] private float jumpCutMultiplier = 0.25f;
     [SerializeField] private float fallSpeed;
 
     [Header("Ground Detection")]
@@ -91,6 +93,9 @@ public class PlayerMovement : MonoBehaviour
         Jump();
 
         JumpPhysics();
+
+        // Update camera position to follow player
+        Camera.transform.position = new Vector3(transform.position.x, transform.position.y, -10f);
     }
 
     private void FixedUpdate()
