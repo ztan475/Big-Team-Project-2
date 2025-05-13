@@ -40,7 +40,7 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        fallSpeed = (moveSpeed / 4);
+        fallSpeed = (moveSpeed / 2);
         // Initialize the state actions dictionary
         InitializeStateActions();
         StateCheck("Idle");
@@ -186,7 +186,7 @@ public class PlayerMovement : MonoBehaviour
         return onGround;
     }
 
-    private void StateCheck(string newState)
+    public void StateCheck(string newState)
     {
         // Check if the state exists in our dictionary
         if (stateActions.TryGetValue(newState, out Action stateAction))
