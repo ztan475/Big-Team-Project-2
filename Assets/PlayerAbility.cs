@@ -82,7 +82,21 @@ public class PlayerAbility : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision) 
     {
+        GameObject collider = collision.gameObject;
         // Allow player to slide vertically against when hitting a wall
-        rb.drag = collision.gameObject.CompareTag("Wall") ? wallDrag: 0;
+        rb.drag = collider.CompareTag("Wall") ? wallDrag : 0;
     }
+
+    void OnTriggerEnter2D(Collider2D collider)
+    {
+        if(collider.CompareTag("Wall"))
+            playerMove.IsOnWall(true);
+    }
+
+    void OnTriggerExit2D(Collider2D collider)
+    {
+        if (collider.CompareTag("Wall"))
+            playerMove.IsOnWall(false);
+    }
+
 }

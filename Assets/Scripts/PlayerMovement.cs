@@ -4,23 +4,26 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
+// Enum for player state machine
+public enum PlayerState
+{
+    Idle,
+    Moving,
+    Jumping,
+    Falling
+    // Add other states as needed
+}
+
 public class PlayerMovement : MonoBehaviour
 {
-    // Enum for player state machine
-    public enum PlayerState
-    {
-        Idle,
-        Moving,
-        Jumping,
-        Falling
-        // Add other states as needed
-    }
+
     [Header("Camera")]
     [SerializeField] private Camera Camera;
 
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private PlayerState playerState;
+    [SerializeField] private bool onWall;
 
     [Header("Jump Parameters")]
     [SerializeField] private float jumpForce = 10f;
@@ -38,11 +41,12 @@ public class PlayerMovement : MonoBehaviour
     private float moveInput;
     private float coyoteTimeCounter;
     private Dictionary<string, Action> stateActions;
+    private bool facingRight;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        fallSpeed = (moveSpeed / 2);
+        facingRight = false;
         // Initialize the state actions dictionary
         InitializeStateActions();
         StateCheck("Idle");
@@ -56,14 +60,12 @@ public class PlayerMovement : MonoBehaviour
             { "Idle", () => {
                 playerState = PlayerState.Idle;
                 // Any Idle-specific animation goes here
-                Debug.Log("Player entered Idle state");
             }},
             
             // Running state setup
             { "Moving", () => {
                 playerState = PlayerState.Moving;
                 // Any Running-specific animation goes here
-                Debug.Log("Player entered Moving state");
             }},
             
             // Jumping state setup
@@ -77,16 +79,17 @@ public class PlayerMovement : MonoBehaviour
             { "Falling", () => {
                 playerState = PlayerState.Falling;
                 // Any Falling-specific logic goes here
-                Debug.Log("Player entered Falling state");
             }},
             
             // Add more states as needed
         };
     }
 
-    private void Update()
+    void Update()
     {
         moveInput = Input.GetAxis("Horizontal");
+
+        Move();
 
         HandleGroundDetection();
 
@@ -98,27 +101,20 @@ public class PlayerMovement : MonoBehaviour
         Camera.transform.position = new Vector3(transform.position.x, transform.position.y, -10f);
     }
 
-    private void FixedUpdate()
-    {
-        // Handle horizontal movement
-        Move();
-    }
-
     private void HandleGroundDetection()
     {
         if (IsGrounded())
         {
             coyoteTimeCounter = coyoteTime;
 
-            // When landing, transition to Idle or Running based on horizontal input
+            // When landing, transition to Running based on horizontal input
             if ((playerState == PlayerState.Jumping || playerState == PlayerState.Falling) && rb.velocity.y <= 0)
             {
                 if (Mathf.Abs(moveInput) > 0.1f)
                     StateCheck("Moving");
-                else
-                    StateCheck("Idle");
             }
         }
+
         else
         {
             coyoteTimeCounter -= Time.deltaTime;
@@ -127,7 +123,8 @@ public class PlayerMovement : MonoBehaviour
             if (playerState != PlayerState.Jumping && playerState != PlayerState.Falling)
             {
                 StateCheck("Falling");
-                rb.velocity = new Vector2(fallSpeed, rb.velocity.y);
+                float freeFall = onWall ? moveSpeed : fallSpeed;
+                rb.velocity = new Vector2(freeFall, rb.velocity.y);
             }
 
         }
@@ -139,6 +136,9 @@ public class PlayerMovement : MonoBehaviour
         moveInput *= moveSpeed;
         rb.velocity = new Vector2(moveInput, rb.velocity.y);
 
+        if (rb.velocity.x == 0f && rb.velocity.y == 0f)
+            StateCheck("Idle");
+
         // Update running state, player can only move if grounded
         if (IsGrounded())
         {
@@ -146,10 +146,6 @@ public class PlayerMovement : MonoBehaviour
             if (Mathf.Abs(rb.velocity.x) > 0.1f && playerState != PlayerState.Moving)
             {
                 StateCheck("Moving");
-            }
-            else if (Mathf.Abs(rb.velocity.x) <= 0.1f && playerState != PlayerState.Idle)
-            {
-                StateCheck("Idle");
             }
         }
     }
@@ -161,11 +157,27 @@ public class PlayerMovement : MonoBehaviour
             coyoteTimeCounter > 0 &&
             (playerState != PlayerState.Jumping))
         {
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce); // Apply jump velocity
+            Vector2 jumpVector = new Vector2(rb.velocity.x, jumpForce);
+            // Apply jump velocity
+            rb.AddForce(jumpVector, ForceMode2D.Impulse);
             StateCheck("Jumping");
 
             // Reset coyote timer after jump
             coyoteTimeCounter = 0;
+        }
+
+        if (Input.GetKey(KeyCode.Space) && onWall
+            && (playerState == PlayerState.Falling) && !onGround)
+        {
+            Debug.Log("Wall jump");
+      
+            rb.drag = 0;
+
+            Vector2 wallJump = new Vector2(rb.velocity.x, 100);
+            rb.AddForce(wallJump);
+
+            StateCheck("Jumping");
+
         }
     }
 
@@ -177,14 +189,15 @@ public class PlayerMovement : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutMultiplier);
         }
 
-        // Fall faster than jump for better feel
+        // If velocity
         if (rb.velocity.y < 0)
         {
-            rb.velocity += Vector2.up * Physics2D.gravity.y * (fallSpeed - 1) * Time.deltaTime;
+            StateCheck("Falling");
         }
+
     }
 
-    private bool IsGrounded()
+    public bool IsGrounded()
     {
         // Use a raycast to check if player is touching the ground
         onGround = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
@@ -211,5 +224,10 @@ public class PlayerMovement : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(groundCheck.position, groundCheckRadius);
+    }
+
+    public void IsOnWall(bool madeContact)
+    {
+        onWall = madeContact;
     }
 }
