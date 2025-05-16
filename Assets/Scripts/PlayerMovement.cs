@@ -10,7 +10,8 @@ public enum PlayerState
     Idle,
     Moving,
     Jumping,
-    Falling
+    Falling,
+    Dash
     // Add other states as needed
 }
 
@@ -80,6 +81,12 @@ public class PlayerMovement : MonoBehaviour
                 playerState = PlayerState.Falling;
                 // Any Falling-specific logic goes here
             }},
+
+            // Idle state setup
+            { "Dash", () => {
+                playerState = PlayerState.Dash;
+                // Any Dash-specific animation goes here
+            }},
             
             // Add more states as needed
         };
@@ -133,9 +140,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void Move()
     {
-        // Calculate target speed
-        moveInput *= moveSpeed;
-        rb.velocity = new Vector2(moveInput, rb.velocity.y);
+        if(playerState != PlayerState.Dash) {
+            // Calculate target speed
+            moveInput *= moveSpeed;
+            rb.velocity = new Vector2(moveInput, rb.velocity.y);
+        }
+        
 
         if (rb.velocity.x == 0f && rb.velocity.y == 0f)
             StateCheck("Idle");

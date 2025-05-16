@@ -11,6 +11,7 @@ public class PlayerAbility : MonoBehaviour
     [SerializeField] private bool isFacingRight;
     [SerializeField] private float wallSlideY;
     [SerializeField] private int dashForce;
+    [SerializeField] private bool dashCD;
 
 
     private Rigidbody2D rb;
@@ -23,9 +24,6 @@ public class PlayerAbility : MonoBehaviour
         playerMove = GetComponent<PlayerMovement>();
         PlayerHP = 100;
         wallSlideY = 1.75f;
-        isFacingRight = false;
-        // calculate direction at start to avoid off-by-one error
-        dashForce = isFacingRight ? Mathf.Abs(dashForce) : -dashForce;
     }
 
     void Update()
@@ -53,7 +51,7 @@ public class PlayerAbility : MonoBehaviour
         }
 
         // Conflicts with movement state velocity
-        if (Input.GetKey(KeyCode.W)) {
+        if (Input.GetKeyDown(KeyCode.W)) {
             DashPlayer();
             return;
         }
@@ -71,10 +69,12 @@ public class PlayerAbility : MonoBehaviour
 
     private void DashPlayer()
     {
-        // Push player in appropiate direction
-        dashForce = isFacingRight ? Mathf.Abs(dashForce) : -dashForce;
-        Vector2 dash = new Vector2(dashForce, rb.velocity.y);
-        rb.velocity = dash;
+        if (!dashCD) {
+            playerMove.StateCheck("Dash");
+            Vector2 dash = new Vector2(dashForce, rb.velocity.y);
+            rb.velocity = dash;
+            StartCoroutine(DashCooldown());
+        }
     }
 
     public void Damage(int dmg)
@@ -106,10 +106,23 @@ public class PlayerAbility : MonoBehaviour
         iFrame = false;
     }
 
+    IEnumerator DashCooldown()
+    {
+        float cooldown = 1f;
+        dashCD = true;
+        while(cooldown > 0)
+        {
+            cooldown -= 1f;
+            yield return new WaitForSeconds(1f);
+        }
+        dashCD = false; 
+    }
+
     private void Flip()
     {
         isFacingRight = !isFacingRight;
         transform.Rotate(0, 180, 0);
+        dashForce *= -1;
     }
 
     void OnDestroy()

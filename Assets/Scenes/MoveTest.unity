@@ -861,9 +861,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a67ec435018f8f745a0819dc3cad42d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isFacingRight: 0
+  isFacingRight: 1
   wallSlideY: 1.75
-  dashForce: 200
+  dashForce: 50
+  dashCD: 0
 --- !u!1 &2130284681
 GameObject:
   m_ObjectHideFlags: 0
