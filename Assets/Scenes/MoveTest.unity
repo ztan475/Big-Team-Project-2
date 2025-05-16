@@ -711,6 +711,7 @@ MonoBehaviour:
   jumpForce: 10
   coyoteTime: 0.1
   jumpCutMultiplier: 0.25
+  wallJumpY: 0
   fallSpeed: 3
   groundCheck: {fileID: 881705513}
   groundCheckRadius: 0.2
@@ -860,7 +861,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a67ec435018f8f745a0819dc3cad42d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wallDrag: 7
+  isFacingRight: 0
+  wallSlideY: 1.75
+  dashForce: 200
 --- !u!1 &2130284681
 GameObject:
   m_ObjectHideFlags: 0

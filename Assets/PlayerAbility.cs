@@ -8,7 +8,9 @@ public class PlayerAbility : MonoBehaviour
 {
     // We only need one instance of player health
     [SerializeField] public static int PlayerHP { get; private set; }
-    [SerializeField] private float wallDrag;
+    [SerializeField] private bool isFacingRight;
+    [SerializeField] private float wallSlideY;
+    [SerializeField] private int dashForce;
 
 
     private Rigidbody2D rb;
@@ -20,18 +22,39 @@ public class PlayerAbility : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         playerMove = GetComponent<PlayerMovement>();
         PlayerHP = 100;
+        wallSlideY = 1.75f;
+        isFacingRight = false;
+        // calculate direction at start to avoid off-by-one error
+        dashForce = isFacingRight ? Mathf.Abs(dashForce) : -dashForce;
     }
 
     void Update()
     {
+        FlipCheck();
         AbilityCheck();
+    }
+
+    private void FlipCheck()
+    {
+        // negative velovity suggests moving left
+        if (rb.velocity.x < 0 && isFacingRight)
+            Flip();
+        // positive velovity suggests moving right (0 is is idle movement)
+        if (rb.velocity.x > 0 && !isFacingRight)
+            Flip();
     }
 
     private void AbilityCheck()
     {
-        if (Input.GetKeyDown(KeyCode.Z))
+        if (Input.GetKey(KeyCode.Z))
         {
             RollPlayer();
+            return;
+        }
+
+        // Conflicts with movement state velocity
+        if (Input.GetKey(KeyCode.W)) {
+            DashPlayer();
             return;
         }
         // Add more abilities as necessary
@@ -44,6 +67,14 @@ public class PlayerAbility : MonoBehaviour
         {
             StartCoroutine(DamageTimer());
         }
+    }
+
+    private void DashPlayer()
+    {
+        // Push player in appropiate direction
+        dashForce = isFacingRight ? Mathf.Abs(dashForce) : -dashForce;
+        Vector2 dash = new Vector2(dashForce, rb.velocity.y);
+        rb.velocity = dash;
     }
 
     public void Damage(int dmg)
@@ -75,6 +106,12 @@ public class PlayerAbility : MonoBehaviour
         iFrame = false;
     }
 
+    private void Flip()
+    {
+        isFacingRight = !isFacingRight;
+        transform.Rotate(0, 180, 0);
+    }
+
     void OnDestroy()
     {
         StopAllCoroutines();
@@ -84,7 +121,7 @@ public class PlayerAbility : MonoBehaviour
     {
         GameObject collider = collision.gameObject;
         // Allow player to slide vertically against when hitting a wall
-        rb.drag = collider.CompareTag("Wall") ? wallDrag : 0;
+        rb.drag = collider.CompareTag("Wall") ? wallSlideY: 0;
     }
 
     void OnTriggerEnter2D(Collider2D collider)

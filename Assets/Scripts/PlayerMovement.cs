@@ -29,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float jumpForce = 10f;
     [SerializeField] private float coyoteTime = 0.1f;
     [SerializeField] private float jumpCutMultiplier = 0.25f;
+    [SerializeField] private int wallJumpY;
     [SerializeField] private float fallSpeed;
 
     [Header("Ground Detection")]
@@ -41,15 +42,15 @@ public class PlayerMovement : MonoBehaviour
     private float moveInput;
     private float coyoteTimeCounter;
     private Dictionary<string, Action> stateActions;
-    private bool facingRight;
+    private bool wallJumpCD = false;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        facingRight = false;
         // Initialize the state actions dictionary
         InitializeStateActions();
         StateCheck("Idle");
+        wallJumpY = 500;
     }
 
     private void InitializeStateActions()
@@ -72,7 +73,6 @@ public class PlayerMovement : MonoBehaviour
             { "Jumping", () => {
                 playerState = PlayerState.Jumping;
                 // Any Jumping-specific animation goes here
-                Debug.Log("Player entered Jumping state");
             }},
             
             // Falling state setup
@@ -122,6 +122,7 @@ public class PlayerMovement : MonoBehaviour
             // If we're not jumping and not grounded, we must be falling
             if (playerState != PlayerState.Jumping && playerState != PlayerState.Falling)
             {
+                // No fall penalty when wall jumping
                 StateCheck("Falling");
                 float freeFall = onWall ? moveSpeed : fallSpeed;
                 rb.velocity = new Vector2(freeFall, rb.velocity.y);
@@ -166,17 +167,20 @@ public class PlayerMovement : MonoBehaviour
             coyoteTimeCounter = 0;
         }
 
-        if (Input.GetKey(KeyCode.Space) && onWall
-            && (playerState == PlayerState.Falling) && !onGround)
+        // Only works if player is falling down wall, not grounded, and not on cooldown
+        if (Input.GetKeyDown(KeyCode.Space) && onWall
+            && (playerState == PlayerState.Falling) && !onGround
+            && !wallJumpCD)
         {
             Debug.Log("Wall jump");
       
             rb.drag = 0;
-
-            Vector2 wallJump = new Vector2(rb.velocity.x, 100);
+            // Instantaneous force needs a much higher number (hundreds) to scale properly
+            Vector2 wallJump = new Vector2(rb.velocity.x, wallJumpY);
             rb.AddForce(wallJump);
 
             StateCheck("Jumping");
+            StartCoroutine(WallJumpCooldown());
 
         }
     }
@@ -184,7 +188,7 @@ public class PlayerMovement : MonoBehaviour
     private void JumpPhysics()
     {
         // Cut jump short when button is released (variable jump height)
-        if (rb.velocity.y > 0 && Input.GetKeyUp(KeyCode.Space))
+        if (rb.velocity.y > 0 && Input.GetKeyUp(KeyCode.Space) && !onWall)
         {
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutMultiplier);
         }
@@ -226,8 +230,24 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.DrawSphere(groundCheck.position, groundCheckRadius);
     }
 
+    void OnDestroy()
+    {
+        StopAllCoroutines();
+    }
+
     public void IsOnWall(bool madeContact)
     {
         onWall = madeContact;
+    }
+
+    IEnumerator WallJumpCooldown()
+    {
+        float cooldown = 2f;
+        wallJumpCD = true;
+        while (cooldown >  0) {
+            cooldown -= 1f;
+            yield return new WaitForSeconds(1f);
+        }
+        wallJumpCD = false;
     }
 }
