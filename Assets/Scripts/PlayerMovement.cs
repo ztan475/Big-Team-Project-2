@@ -57,6 +57,8 @@ public bool wall;
 
     private void InitializeStateActions()
     {
+       
+        
         stateActions = new Dictionary<string, Action>
         {
             // Idle state setup
@@ -65,6 +67,7 @@ public bool wall;
                 anim.SetBool("isRunning",false);
                  anim.SetBool("isRolling",false);
                    anim.SetBool("isJumping",false);
+                   
 
                 // Any Idle-specific animation goes here
             }},
@@ -102,6 +105,7 @@ public bool wall;
 
     void Update()
     {
+       
         moveInput = Input.GetAxis("Horizontal");
 
         Move();
@@ -121,15 +125,17 @@ public bool wall;
         if (IsGrounded())
         {
           
-            
+          
             coyoteTimeCounter = coyoteTime;
 
             // When landing, transition to Running based on horizontal input
             if ((playerState == PlayerState.Jumping || playerState == PlayerState.Falling) && rb.velocity.y <= 0)
             {
+               
                 if (Mathf.Abs(moveInput) > 0.1f)
                     StateCheck("Moving");
             }
+           
         }
 
         else
@@ -258,6 +264,12 @@ public bool wall;
 
     public void IsOnWall(bool madeContact)
     {
+        if(madeContact){
+        wall=true;
+        }
+        else{
+          wall=false;
+        }
         onWall = madeContact;
     }
 

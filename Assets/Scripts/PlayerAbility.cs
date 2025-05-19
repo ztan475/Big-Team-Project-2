@@ -6,6 +6,7 @@ using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class PlayerAbility : MonoBehaviour
 {
+    public static bool wall = false;
     // We only need one instance of player health
     [SerializeField] public static int PlayerHP { get; private set; }
     [SerializeField] private bool isFacingRight;
@@ -28,6 +29,7 @@ public class PlayerAbility : MonoBehaviour
 
     void Update()
     {
+        
         FlipCheck();
         AbilityCheck();
     }
@@ -135,18 +137,33 @@ public class PlayerAbility : MonoBehaviour
         GameObject collider = collision.gameObject;
         // Allow player to slide vertically against when hitting a wall
         rb.drag = collider.CompareTag("Wall") ? wallSlideY: 0;
+      if(collision.gameObject.tag=="Wall"){
+        wall=true;
+      }
     }
+
+   void OnCollisionExit2D(Collision2D col){
+     if(col.gameObject.tag=="Wall"){
+        wall=true;
+      }
+   }
 
     void OnTriggerEnter2D(Collider2D collider)
     {
-        if(collider.CompareTag("Wall"))
+        if(collider.CompareTag("Wall")){
             playerMove.IsOnWall(true);
+           
+            
+        }
     }
 
     void OnTriggerExit2D(Collider2D collider)
     {
-        if (collider.CompareTag("Wall"))
+        if (collider.CompareTag("Wall")){
+
             playerMove.IsOnWall(false);
+             
+        }
     }
 
 }
