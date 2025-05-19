@@ -17,7 +17,8 @@ public enum PlayerState
 
 public class PlayerMovement : MonoBehaviour
 {
-
+public Animator anim;
+public bool wall;
     [Header("Camera")]
     [SerializeField] private Camera Camera;
 
@@ -61,18 +62,24 @@ public class PlayerMovement : MonoBehaviour
             // Idle state setup
             { "Idle", () => {
                 playerState = PlayerState.Idle;
+                anim.SetBool("isRunning",false);
+                 anim.SetBool("isRolling",false);
+                   anim.SetBool("isJumping",false);
+
                 // Any Idle-specific animation goes here
             }},
             
             // Running state setup
             { "Moving", () => {
                 playerState = PlayerState.Moving;
+                  anim.SetBool("isRunning",true);
                 // Any Running-specific animation goes here
             }},
             
             // Jumping state setup
             { "Jumping", () => {
                 playerState = PlayerState.Jumping;
+                  anim.SetBool("isJumping",true);
                 // Any Jumping-specific animation goes here
             }},
             
@@ -85,6 +92,7 @@ public class PlayerMovement : MonoBehaviour
             // Idle state setup
             { "Dash", () => {
                 playerState = PlayerState.Dash;
+                anim.SetBool("isRolling",true);
                 // Any Dash-specific animation goes here
             }},
             
@@ -112,6 +120,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (IsGrounded())
         {
+          
+            
             coyoteTimeCounter = coyoteTime;
 
             // When landing, transition to Running based on horizontal input
@@ -232,6 +242,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+
     // Draw ground check in the editor for debugging
     // Will not work if the groundCheck object is not assigned in inpector
     private void OnDrawGizmos()
@@ -252,6 +263,7 @@ public class PlayerMovement : MonoBehaviour
 
     IEnumerator WallJumpCooldown()
     {
+       
         float cooldown = 2f;
         wallJumpCD = true;
         while (cooldown >  0) {
