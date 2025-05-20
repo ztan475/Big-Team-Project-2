@@ -64,38 +64,37 @@ public bool wall;
             // Idle state setup
             { "Idle", () => {
                 playerState = PlayerState.Idle;
-                anim.SetBool("isRunning",false);
-                 anim.SetBool("isRolling",false);
-                   anim.SetBool("isJumping",false);
-                   
-
+                anim.Play("idle");
                 // Any Idle-specific animation goes here
             }},
             
             // Running state setup
             { "Moving", () => {
                 playerState = PlayerState.Moving;
-                  anim.SetBool("isRunning",true);
+                anim.Play("run");
                 // Any Running-specific animation goes here
             }},
             
             // Jumping state setup
             { "Jumping", () => {
                 playerState = PlayerState.Jumping;
-                  anim.SetBool("isJumping",true);
+                anim.Play("jump");
                 // Any Jumping-specific animation goes here
             }},
             
             // Falling state setup
             { "Falling", () => {
                 playerState = PlayerState.Falling;
+                if(onWall){
+                    anim.Play("wall");
+                }
                 // Any Falling-specific logic goes here
             }},
 
             // Idle state setup
             { "Dash", () => {
                 playerState = PlayerState.Dash;
-                anim.SetBool("isRolling",true);
+                anim.Play("roll");
                 // Any Dash-specific animation goes here
             }},
             

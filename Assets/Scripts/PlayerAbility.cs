@@ -137,9 +137,9 @@ public class PlayerAbility : MonoBehaviour
         GameObject collider = collision.gameObject;
         // Allow player to slide vertically against when hitting a wall
         rb.drag = collider.CompareTag("Wall") ? wallSlideY: 0;
-      if(collision.gameObject.tag=="Wall"){
-        wall=true;
-      }
+        if(collision.gameObject.tag=="Wall"){
+            wall=true;
+        }
     }
 
    void OnCollisionExit2D(Collision2D col){
