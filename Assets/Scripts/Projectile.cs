@@ -5,17 +5,19 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     // Start is called before the first frame update
-    public GameObject projectileObject;
     public float projectileSpeed = 10f;
+    Rigidbody2D rb;
 
     void Start()
     {
-        
+        rb = GetComponent<Rigidbody2D>();   
     }
 
-    // Update is called once per frame
-    void Update()
+
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        
+        if(!collision.gameObject.CompareTag("Player"))
+            Destroy(gameObject);
+
     }
 }

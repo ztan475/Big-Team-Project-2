@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.UI;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class PlayerAbility : MonoBehaviour
@@ -13,19 +14,18 @@ public class PlayerAbility : MonoBehaviour
     [SerializeField] private float wallSlideY;
     [SerializeField] private int dashForce;
     [SerializeField] private bool dashCD;
-    
+    public GameObject projectilePrefab;
+
 
 
     private Rigidbody2D rb;
-    private bool iFrame = false;
+    public bool iFrame = false;
     private PlayerMovement playerMove;
-    private Projectile projectile;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         playerMove = GetComponent<PlayerMovement>();
-        projectile = GetComponent<Projectile>();
         PlayerHP = 100;
         wallSlideY = 1.75f;
     }
@@ -60,12 +60,19 @@ public class PlayerAbility : MonoBehaviour
             DashPlayer();
             return;
         }
+
+        // Check for projectile ability (left click)
+        if (Input.GetMouseButtonDown(0)) {
+            Vector2 direction = isFacingRight ? Vector2.right : Vector2.left;
+            FireProjectile(direction);
+            return;
+        }
         // Add more abilities as necessary
     }
 
     private void RollPlayer()
     {
-        playerMove.StateCheck("Rolling");
+        playerMove.StateCheck("Roll");
         if (!iFrame)
         {
             StartCoroutine(DamageTimer());
@@ -101,14 +108,16 @@ public class PlayerAbility : MonoBehaviour
     // Allows invincibilty frames to trigger
     IEnumerator DamageTimer()
     {
-        float cooldown = 2f;
+        float cooldown = 4f;
         iFrame = true;
+        transform.localScale = new Vector3(1f, 0.8f, 1f);
         while (cooldown > 0)
         {
             cooldown -= 1f;
             yield return new WaitForSeconds(1f);
         }
         iFrame = false;
+        transform.localScale = new Vector3(1f, 1f, 1f);
     }
 
     IEnumerator DashCooldown()
@@ -132,9 +141,13 @@ public class PlayerAbility : MonoBehaviour
 
     private void FireProjectile(Vector2 direction)
     {
-        GameObject projectileInstance = Instantiate(projectile.projectileObject, transform.position, Quaternion.identity);
+        GameObject projectileInstance = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
         Rigidbody2D projectileRb = projectileInstance.GetComponent<Rigidbody2D>();
-        projectileRb.velocity = direction * projectile.projectileSpeed;
+        Projectile projectileScript = projectileInstance.GetComponent<Projectile>();
+        if (projectileRb != null && projectileScript != null)
+        {
+            projectileRb.velocity = direction * projectileScript.projectileSpeed;
+        }
     }   
 
     void OnDestroy()
