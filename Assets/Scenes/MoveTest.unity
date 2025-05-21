@@ -871,6 +871,10 @@ PrefabInstance:
       propertyPath: Camera
       value: 
       objectReference: {fileID: 364505412}
+    - target: {fileID: 7310906738927060632, guid: 639ef3a9710886f4e9996a2b90a4d753, type: 3}
+      propertyPath: wallJumpY
+      value: 500
+      objectReference: {fileID: 0}
     - target: {fileID: 7939380878551198656, guid: 639ef3a9710886f4e9996a2b90a4d753, type: 3}
       propertyPath: wallSlideY
       value: 1
