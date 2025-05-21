@@ -13,16 +13,19 @@ public class PlayerAbility : MonoBehaviour
     [SerializeField] private float wallSlideY;
     [SerializeField] private int dashForce;
     [SerializeField] private bool dashCD;
+    
 
 
     private Rigidbody2D rb;
     private bool iFrame = false;
     private PlayerMovement playerMove;
+    private Projectile projectile;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         playerMove = GetComponent<PlayerMovement>();
+        projectile = GetComponent<Projectile>();
         PlayerHP = 100;
         wallSlideY = 1.75f;
     }
@@ -126,6 +129,13 @@ public class PlayerAbility : MonoBehaviour
         transform.Rotate(0, 180, 0);
         dashForce *= -1;
     }
+
+    private void FireProjectile(Vector2 direction)
+    {
+        GameObject projectileInstance = Instantiate(projectile.projectileObject, transform.position, Quaternion.identity);
+        Rigidbody2D projectileRb = projectileInstance.GetComponent<Rigidbody2D>();
+        projectileRb.velocity = direction * projectile.projectileSpeed;
+    }   
 
     void OnDestroy()
     {
