@@ -55,7 +55,7 @@ public bool wall;
         // Initialize the state actions dictionary
         InitializeStateActions();
         StateCheck("Idle");
-        wallJumpY = 500;
+        wallJumpY = 600;
     }
 
     private void InitializeStateActions()
