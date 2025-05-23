@@ -7,6 +7,8 @@ using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class PlayerAbility : MonoBehaviour
 {
+    public GameObject EnergyTemp;
+    public  static GameObject Energy;
     public static bool wall = false;
     // We only need one instance of player health
     [SerializeField] public static int PlayerHP { get; private set; }
@@ -24,6 +26,7 @@ public class PlayerAbility : MonoBehaviour
 
     void Start()
     {
+        Energy=EnergyTemp;
         rb = GetComponent<Rigidbody2D>();
         playerMove = GetComponent<PlayerMovement>();
         PlayerHP = 100;
@@ -141,7 +144,7 @@ public class PlayerAbility : MonoBehaviour
 
     private void FireProjectile(Vector2 direction)
     {
-        GameObject projectileInstance = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+        GameObject projectileInstance = Instantiate(projectilePrefab, new Vector2(transform.position.x+.1f,transform.position.y), Quaternion.identity);
         Rigidbody2D projectileRb = projectileInstance.GetComponent<Rigidbody2D>();
         Projectile projectileScript = projectileInstance.GetComponent<Projectile>();
         if (projectileRb != null && projectileScript != null)
