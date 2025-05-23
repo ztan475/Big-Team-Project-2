@@ -11,7 +11,8 @@ public enum PlayerState
     Moving,
     Jumping,
     Falling,
-    Dash
+    Dash,
+    Roll
     // Add other states as needed
 }
 
@@ -45,14 +46,16 @@ public bool wall;
     private float coyoteTimeCounter;
     private Dictionary<string, Action> stateActions;
     private bool wallJumpCD = false;
+    private PlayerAbility ability;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        ability = GetComponent<PlayerAbility>();
         // Initialize the state actions dictionary
         InitializeStateActions();
         StateCheck("Idle");
-        wallJumpY = 500;
+        wallJumpY = 600;
     }
 
     private void InitializeStateActions()
@@ -64,38 +67,44 @@ public bool wall;
             // Idle state setup
             { "Idle", () => {
                 playerState = PlayerState.Idle;
-                anim.SetBool("isRunning",false);
-                 anim.SetBool("isRolling",false);
-                   anim.SetBool("isJumping",false);
-                   
-
+                anim.Play("idle");
                 // Any Idle-specific animation goes here
             }},
             
             // Running state setup
             { "Moving", () => {
                 playerState = PlayerState.Moving;
-                  anim.SetBool("isRunning",true);
+                anim.Play("run");
                 // Any Running-specific animation goes here
             }},
             
             // Jumping state setup
             { "Jumping", () => {
                 playerState = PlayerState.Jumping;
-                  anim.SetBool("isJumping",true);
+                anim.Play("jump");
                 // Any Jumping-specific animation goes here
             }},
             
             // Falling state setup
             { "Falling", () => {
                 playerState = PlayerState.Falling;
+                if(onWall){
+                    anim.Play("wall");
+                }
                 // Any Falling-specific logic goes here
             }},
 
             // Idle state setup
             { "Dash", () => {
                 playerState = PlayerState.Dash;
-                anim.SetBool("isRolling",true);
+                anim.Play("roll");
+                // Any Dash-specific animation goes here
+            }},
+
+             // Idle state setup
+            { "Roll", () => {
+                playerState = PlayerState.Roll;
+                anim.Play("roll");
                 // Any Dash-specific animation goes here
             }},
             
@@ -133,7 +142,13 @@ public bool wall;
             {
                
                 if (Mathf.Abs(moveInput) > 0.1f)
-                    StateCheck("Moving");
+                {
+                    if (!ability.iFrame)
+                        StateCheck("Moving");
+                    else
+                        StateCheck("Roll");
+                }
+                    
             }
            
         }
@@ -172,7 +187,10 @@ public bool wall;
 
             if (Mathf.Abs(rb.velocity.x) > 0.1f && playerState != PlayerState.Moving)
             {
-                StateCheck("Moving");
+                if(!ability.iFrame)
+                    StateCheck("Moving");
+                else
+                    StateCheck("Roll");
             }
         }
     }

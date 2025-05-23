@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.UI;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class PlayerAbility : MonoBehaviour
@@ -13,10 +14,12 @@ public class PlayerAbility : MonoBehaviour
     [SerializeField] private float wallSlideY;
     [SerializeField] private int dashForce;
     [SerializeField] private bool dashCD;
+    public GameObject projectilePrefab;
+
 
 
     private Rigidbody2D rb;
-    private bool iFrame = false;
+    public bool iFrame = false;
     private PlayerMovement playerMove;
 
     void Start()
@@ -57,12 +60,19 @@ public class PlayerAbility : MonoBehaviour
             DashPlayer();
             return;
         }
+
+        // Check for projectile ability (left click)
+        if (Input.GetMouseButtonDown(0)) {
+            Vector2 direction = isFacingRight ? Vector2.right : Vector2.left;
+            FireProjectile(direction);
+            return;
+        }
         // Add more abilities as necessary
     }
 
     private void RollPlayer()
     {
-        playerMove.StateCheck("Rolling");
+        playerMove.StateCheck("Roll");
         if (!iFrame)
         {
             StartCoroutine(DamageTimer());
@@ -98,14 +108,16 @@ public class PlayerAbility : MonoBehaviour
     // Allows invincibilty frames to trigger
     IEnumerator DamageTimer()
     {
-        float cooldown = 2f;
+        float cooldown = 4f;
         iFrame = true;
+        transform.localScale = new Vector3(1f, 0.8f, 1f);
         while (cooldown > 0)
         {
             cooldown -= 1f;
             yield return new WaitForSeconds(1f);
         }
         iFrame = false;
+        transform.localScale = new Vector3(1f, 1f, 1f);
     }
 
     IEnumerator DashCooldown()
@@ -127,6 +139,17 @@ public class PlayerAbility : MonoBehaviour
         dashForce *= -1;
     }
 
+    private void FireProjectile(Vector2 direction)
+    {
+        GameObject projectileInstance = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+        Rigidbody2D projectileRb = projectileInstance.GetComponent<Rigidbody2D>();
+        Projectile projectileScript = projectileInstance.GetComponent<Projectile>();
+        if (projectileRb != null && projectileScript != null)
+        {
+            projectileRb.velocity = direction * projectileScript.projectileSpeed;
+        }
+    }   
+
     void OnDestroy()
     {
         StopAllCoroutines();
@@ -137,9 +160,9 @@ public class PlayerAbility : MonoBehaviour
         GameObject collider = collision.gameObject;
         // Allow player to slide vertically against when hitting a wall
         rb.drag = collider.CompareTag("Wall") ? wallSlideY: 0;
-      if(collision.gameObject.tag=="Wall"){
-        wall=true;
-      }
+        if(collision.gameObject.tag=="Wall"){
+            wall=true;
+        }
     }
 
    void OnCollisionExit2D(Collision2D col){
