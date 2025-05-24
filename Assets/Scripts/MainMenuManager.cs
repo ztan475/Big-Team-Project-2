@@ -3,16 +3,23 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuManager : MonoBehaviour
 {
+    [SerializeField] private GameObject settings;
+    [SerializeField] private GameObject credits;
     public void StartGame()
     {
         // Loads the gameplay scene
-        SceneManager.LoadScene("MoveTest"); // Make sure the name matches exactly
+        SceneManager.LoadScene("Scene1"); // Make sure the name matches exactly
     }
 
     public void OpenSettings()
     {
-        Debug.Log("Settings button clicked");
-        // You can show a settings panel here
+        settings.SetActive(true);
+    }
+
+    public void CloseSettings()
+    {
+        settings.SetActive(false);
+        Debug.Log("Settings closed");
     }
 
     public void QuitGame()
