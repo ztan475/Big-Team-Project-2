@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum CollectibleType
-    {
-        TypeA,
-        TypeB
-    }
+{
+    TypeA,
+    TypeB,
+}
 
 public class Collectible : MonoBehaviour
 {

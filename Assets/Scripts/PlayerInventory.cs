@@ -15,7 +15,7 @@ public class PlayerInventory : MonoBehaviour
 
     [Header("Door Logic")]
     public GameObject[] doorsToOpen;
-    public int requiredA = 0;
+    public int requiredA = 1;
     public int requiredB = 0;
 
     private bool doorsOpened = false;
@@ -51,7 +51,7 @@ public class PlayerInventory : MonoBehaviour
                 break;
         }
 
-        CheckToOpenDoors();
+        // CheckToOpenDoors();
         UpdateHUD();
     }
 
@@ -60,19 +60,32 @@ public class PlayerInventory : MonoBehaviour
         pickupAAmount.text = "PickupA: " + collectibleTypeACount.ToString();
         pickupBAmount.text = "PickupB: " + collectibleTypeBCount.ToString();
     }
+
+    // private void CheckToOpenDoors()
+    // {
+    //     if (!doorsOpened && collectibleTypeACount >= requiredA && collectibleTypeBCount >= requiredB)
+    //     {
+    //         foreach (GameObject door in doorsToOpen)
+    //         {
+    //             if (door != null)
+    //             {
+    //                 door.SetActive(false);
+    //             }
+    //         }
+    //         doorsOpened = true;
+    //     }
+    // }
     
-    private void CheckToOpenDoors()
+    public bool TrySpendCollectibles(int costA, int costB)
     {
-        if (!doorsOpened && collectibleTypeACount >= requiredA && collectibleTypeBCount >= requiredB)
+        if (collectibleTypeACount >= costA && collectibleTypeBCount >= costB)
         {
-            foreach (GameObject door in doorsToOpen)
-            {
-                if (door != null)
-                {
-                    door.SetActive(false);
-                }
-            }
-            doorsOpened = true;
+            collectibleTypeACount -= costA;
+            collectibleTypeBCount -= costB;
+            UpdateHUD();
+            return true;
         }
+        return false;
     }
+
 }
