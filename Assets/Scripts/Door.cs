@@ -10,6 +10,7 @@ public class Door : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if(other.tag=="Player"){
         Debug.Log("Player entered door range");
         if (isOpen) return;
 
@@ -24,6 +25,7 @@ public class Door : MonoBehaviour
             {
                 Debug.Log("Not enough collectibles to open this door.");
             }
+        }
         }
     }
 
