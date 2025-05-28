@@ -8,7 +8,7 @@ using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 public class PlayerAbility : MonoBehaviour
 {
     public GameObject EnergyTemp;
-    public  static GameObject Energy;
+    public static GameObject Energy;
     public static bool wall = false;
     // We only need one instance of player health
     [SerializeField] public static int PlayerHP { get; private set; }
