@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 933088661070070042}
   - component: {fileID: 2729287896998726190}
   - component: {fileID: 6769383738074905105}
+  - component: {fileID: 5592784672036780815}
   m_Layer: 0
   m_Name: PlatformDrone
   m_TagString: Untagged
@@ -176,6 +177,7 @@ MonoBehaviour:
   aggroRange: 3
   disengageRange: 7
   moveSpeed: 2
+  stoppingDistance: 2
   maxHealth: 10
   currentHealth: 0
   groundCheck: {fileID: 6822865687871495111}
@@ -183,6 +185,26 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  wallDetectionRadius: 0.5
+--- !u!114 &5592784672036780815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4739727984805260568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b679dc96c3508c40ad7dd081edd1a33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cooldown: 2
+  attackRange: 1.25
+  damage: 2
+  attackPoint: {fileID: 298322516087078879}
+  playerMask:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!1 &5044921708435975108
 GameObject:
   m_ObjectHideFlags: 0

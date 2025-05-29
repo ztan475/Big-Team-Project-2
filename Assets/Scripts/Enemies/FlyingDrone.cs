@@ -13,7 +13,7 @@ public class FlyingDrone : Enemy
     private bool reversed;
 
     [Header("Chase Settings")]
-    [SerializeField] private float stoppingDistance = 3f;
+    
     [SerializeField] private LayerMask obstaclemask;
     [SerializeField] private float sightCheckInterval = 0.5f;
     private float sightTimer;
@@ -40,11 +40,13 @@ public class FlyingDrone : Enemy
     {
         if (GetDistanceToPlayer() <= stoppingDistance) {
             rb.velocity = Vector2.zero;
+            if (!canAttack) canAttack = true;
             return;
         }
 
         Vector2 dir = (player.position - transform.position).normalized;
         rb.velocity = dir * moveSpeed;
+        if (canAttack) canAttack = false;
     }
 
     private void Patrol()

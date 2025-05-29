@@ -11,6 +11,7 @@ public abstract class Enemy : MonoBehaviour
     [SerializeField] protected float aggroRange = 5f;
     [SerializeField] protected float disengageRange = 10f;
     [SerializeField] protected float moveSpeed = 2f;
+    [SerializeField] protected float stoppingDistance = 3f;
 
     [Space(20)]
     public float maxHealth = 10f;
@@ -19,6 +20,9 @@ public abstract class Enemy : MonoBehaviour
     protected Transform player;
     protected Rigidbody2D rb;
     protected bool isAggro;
+    protected bool canAttack;
+    public bool IsAggro => isAggro;
+    public bool CanAttack => canAttack && isAggro;
 
     // Set to static since I don't think we will care much which enemy dies
     //      in cases where we are tracking enemy death. If we do, we can

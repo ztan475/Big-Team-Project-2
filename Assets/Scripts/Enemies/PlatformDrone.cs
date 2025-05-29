@@ -9,6 +9,8 @@ public class PlatformDrone : Enemy
     [SerializeField] private Transform wallCheck;
     [SerializeField] private LayerMask groundLayer;
 
+    [SerializeField] private float wallDetectionRadius = 0.5f;
+
     private bool movingRight = true;
 
     protected override void Update()
@@ -32,8 +34,15 @@ public class PlatformDrone : Enemy
 
     private void Chase()
     {
+        if (GetDistanceToPlayer() <= stoppingDistance) {
+            rb.velocity = Vector2.zero;
+            if (!canAttack) canAttack = true;
+            return;
+        }
+
         float dir = player.position.x - transform.position.x;
         rb.velocity = new Vector2(Mathf.Sign(dir) * moveSpeed, rb.velocity.y);
+        if (canAttack) canAttack = false;
 
         // Flip sprite to face player if needed
         if ((dir > 0 && !movingRight) || (dir < 0 && movingRight))
@@ -55,7 +64,9 @@ public class PlatformDrone : Enemy
 
     private bool WallAhead()
     {
-        return Physics2D.Raycast(wallCheck.position, transform.right, 0.1f, groundLayer);
+        // return Physics2D.Raycast(wallCheck.position, transform.right, 0.1f, groundLayer);
+        // Swapped to OverlapCircle so the wall detection area is more thorough
+        return Physics2D.OverlapCircle(wallCheck.position, wallDetectionRadius, groundLayer);
     }
 
     private void OnDrawGizmosSelected()
@@ -68,6 +79,9 @@ public class PlatformDrone : Enemy
         if (wallCheck != null) {
             Gizmos.color = Color.red;
             Gizmos.DrawLine(wallCheck.position, wallCheck.position + transform.right * 0.1f);
+
+            Gizmos.color = Color.white;
+            Gizmos.DrawWireSphere(wallCheck.position, wallDetectionRadius);
         }
     }
 }
