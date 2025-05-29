@@ -239,12 +239,12 @@ public bool wall;
         }
 
         // Check vertical velocity while in air
-        if (rb.velocity.y < 0 && playerState != PlayerState.Falling)
+        if (rb.velocity.y < 0 && playerState != PlayerState.Falling && !onGround)
         {
             StateCheck("Falling");
         }
 
-        if(rb.velocity.y > 0 && playerState != PlayerState.Jumping)
+        if(rb.velocity.y > 0 && playerState != PlayerState.Jumping && !onGround)
         {
             StateCheck("Jumping");
         }
