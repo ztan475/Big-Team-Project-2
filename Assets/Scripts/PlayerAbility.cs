@@ -42,12 +42,16 @@ public class PlayerAbility : MonoBehaviour
 
     private void FlipCheck()
     {
-        // negative velovity suggests moving left
-        if (rb.velocity.x < 0 && isFacingRight)
-            Flip();
-        // positive velovity suggests moving right (0 is is idle movement)
-        if (rb.velocity.x > 0 && !isFacingRight)
-            Flip();
+        // Set a trheshold for flip detection so player doesn't flicker uncontrollably
+        const float threshold = 0.1f;
+        if (Mathf.Abs(rb.velocity.x) > threshold) {
+            // negative velovity suggests moving left
+            if (rb.velocity.x < 0 && isFacingRight)
+                Flip();
+            // positive velovity suggests moving right (0 is is idle movement)
+            if (rb.velocity.x > 0 && !isFacingRight)
+                Flip();
+        }
     }
 
     private void AbilityCheck()
@@ -113,7 +117,7 @@ public class PlayerAbility : MonoBehaviour
     {
         float cooldown = 4f;
         iFrame = true;
-        transform.localScale = new Vector3(1f, 0.8f, 1f);
+        transform.localScale = new Vector3(1f, 0.5f, 1f);
         while (cooldown > 0)
         {
             cooldown -= 1f;
@@ -138,7 +142,12 @@ public class PlayerAbility : MonoBehaviour
     private void Flip()
     {
         isFacingRight = !isFacingRight;
-        transform.Rotate(0, 180, 0);
+
+        // Flip the player's local scale on the X axis
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
+
         dashForce *= -1;
     }
 

@@ -300,7 +300,7 @@ public bool wall;
     IEnumerator WallJumpCooldown()
     {
        
-        float cooldown = 2f;
+        float cooldown = 1f;
         wallJumpCD = true;
         while (cooldown >  0) {
             cooldown -= 1f;

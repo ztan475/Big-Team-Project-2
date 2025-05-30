@@ -5,10 +5,12 @@ public class Door : MonoBehaviour
     [SerializeField] private int requiredA;
     [SerializeField] private int requiredB;
     public Sprite openDoor;
+    public Gate exit;
 
     private bool isOpen = false;
     private SpriteRenderer spriteRenderer;
     private PlayerInventory inventory;
+    private GameObject player;
 
     void Start()
     {
@@ -20,8 +22,14 @@ public class Door : MonoBehaviour
     {
         if (other.tag == "Player")
         {
+
+            if (player == null)
+            {
+                player = other.gameObject;
+            }
+
             Debug.Log("Player entered door range");
-            if (isOpen) return;
+            // Teleport player only when open
 
             if (inventory != null)
             {
@@ -43,6 +51,7 @@ public class Door : MonoBehaviour
         if (openDoor != null)
         {
             spriteRenderer.sprite = openDoor;
+            exit.Teleport(player.transform);
         }
     }
 }
