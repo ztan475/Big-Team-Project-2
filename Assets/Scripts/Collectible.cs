@@ -25,7 +25,7 @@ public class Collectible : MonoBehaviour
     void Start()
     {
         popupMenu.enabled = false;
-        playerInventory = FindObjectOfType<PlayerInventory>();
+        playerInventory = PlayerInventory.Instance;
     }
 
     // Update is called once per frame

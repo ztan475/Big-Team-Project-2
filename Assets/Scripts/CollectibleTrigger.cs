@@ -8,7 +8,7 @@ public class CollectibleTrigger : MonoBehaviour
 
     private void Start()
     {
-        parentScript = GetComponentInParent<Collectible>();
+        parentScript = GetComponent<Collectible>();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
