@@ -19,12 +19,12 @@ public class Projectile : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if(!collision.gameObject.CompareTag("Player"))
+    if (collision.gameObject.CompareTag("Enemy")) {
+            Instantiate(PlayerAbility.Energy, collision.gameObject.transform.position, transform.rotation).SetActive(true);
+            Destroy(collision.gameObject);
+    }
+
+    if (!collision.gameObject.CompareTag("Player"))
             Destroy(gameObject);
-if(collision.gameObject.tag=="Dummy"){
-    if( collision.gameObject.transform.position.x>min.x)
-  Instantiate(PlayerAbility.Energy, collision.gameObject.transform.position, transform.rotation).SetActive(true);
-  min= collision.gameObject.transform.position;
-}
     }
 }
