@@ -10,28 +10,22 @@ public class PlayerInventory : MonoBehaviour
     [SerializeField] private TextMeshProUGUI pickupBAmount;
 
     [Header("Collectible Amounts")]
-    public int collectibleTypeACount = 0;
-    public int collectibleTypeBCount = 0;
+    [SerializeField] private int collectibleTypeACount;
+    [SerializeField] private int collectibleTypeBCount;
 
-    [Header("Door Logic")]
-    public GameObject[] doorsToOpen;
-    public int requiredA = 1;
-    public int requiredB = 0;
-
-    private bool doorsOpened = false;
+    public static PlayerInventory Instance { get; private set; } 
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
         pickupAAmount = GameObject.Find("PickupAAmount").GetComponent<TextMeshProUGUI>();
         pickupBAmount = GameObject.Find("PickupBAmount").GetComponent<TextMeshProUGUI>();
         UpdateHUD();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     public void AddCollectible(CollectibleType type)
@@ -60,21 +54,6 @@ public class PlayerInventory : MonoBehaviour
         pickupAAmount.text = "PickupA: " + collectibleTypeACount.ToString();
         pickupBAmount.text = "PickupB: " + collectibleTypeBCount.ToString();
     }
-
-    // private void CheckToOpenDoors()
-    // {
-    //     if (!doorsOpened && collectibleTypeACount >= requiredA && collectibleTypeBCount >= requiredB)
-    //     {
-    //         foreach (GameObject door in doorsToOpen)
-    //         {
-    //             if (door != null)
-    //             {
-    //                 door.SetActive(false);
-    //             }
-    //         }
-    //         doorsOpened = true;
-    //     }
-    // }
     
     public bool TrySpendCollectibles(int costA, int costB)
     {
