@@ -5,8 +5,9 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class EnemyProjectile : MonoBehaviour
 {
-    [SerializeField] private float damage = 4f;
+    [SerializeField] private int damage = 4;
     [SerializeField] private float lifetime = 5f;
+    private PlayerAbility player;
 
     private void Start()
     {
@@ -17,7 +18,8 @@ public class EnemyProjectile : MonoBehaviour
     {
         if (other.CompareTag("Player")) {
             // Deal Damage Player
-            Debug.Log("ENEMY PROJECTILE HIT PLAYER");
+            player = (player == null) ? other.gameObject.GetComponent<PlayerAbility>() : player;
+            player.Damage(damage);
         }
 
         Destroy(gameObject);

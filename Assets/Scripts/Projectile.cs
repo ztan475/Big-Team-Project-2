@@ -21,6 +21,13 @@ public class Projectile : MonoBehaviour
     {
     if (collision.gameObject.CompareTag("Enemy")) {
             Instantiate(PlayerAbility.Energy, collision.gameObject.transform.position, transform.rotation).SetActive(true);
+            Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+            enemy.maxHealth -= 2;
+    }
+
+    if (collision.gameObject.CompareTag("Dummy"))
+    {
+            Instantiate(PlayerAbility.Energy, collision.gameObject.transform.position, transform.rotation).SetActive(true);
             Destroy(collision.gameObject);
     }
 

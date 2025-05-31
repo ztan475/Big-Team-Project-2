@@ -24,6 +24,7 @@ public class FlyingDrone : Enemy
         base.Start();
         foreach (Transform point in pathContainer) waypoints.Add(point);
         transform.position = waypoints[currentWaypointIndex].position;
+        currentHealth = maxHealth;
     }
 
     protected override void Update()

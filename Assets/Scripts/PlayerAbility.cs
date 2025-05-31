@@ -11,7 +11,7 @@ public class PlayerAbility : MonoBehaviour
     public static GameObject Energy;
     public static bool wall = false;
     // We only need one instance of player health
-    [SerializeField] public static int PlayerHP { get; private set; }
+    [SerializeField] public static int PlayerHP { get;  private set; }
     [SerializeField] private bool isFacingRight;
     [SerializeField] private float wallSlideY;
     [SerializeField] private int dashForce;
@@ -29,20 +29,19 @@ public class PlayerAbility : MonoBehaviour
         Energy=EnergyTemp;
         rb = GetComponent<Rigidbody2D>();
         playerMove = GetComponent<PlayerMovement>();
-        PlayerHP = 100;
+        PlayerHP = 40;
         wallSlideY = 1.75f;
     }
 
     void Update()
-    {
-        
+    {     
         FlipCheck();
         AbilityCheck();
     }
 
     private void FlipCheck()
     {
-        // Set a trheshold for flip detection so player doesn't flicker uncontrollably
+        // Set a threshold for flip detection so player doesn't flicker uncontrollably
         const float threshold = 0.1f;
         if (Mathf.Abs(rb.velocity.x) > threshold) {
             // negative velovity suggests moving left
@@ -79,9 +78,10 @@ public class PlayerAbility : MonoBehaviour
 
     private void RollPlayer()
     {
-        playerMove.StateCheck("Roll");
+       
         if (!iFrame)
         {
+            playerMove.StateCheck("Roll");
             StartCoroutine(DamageTimer());
         }
     }
@@ -102,6 +102,7 @@ public class PlayerAbility : MonoBehaviour
         if (!iFrame)
         {
             PlayerHP -= dmg;
+            CheckHealth();
             StartCoroutine(DamageTimer());
         }
 
@@ -112,19 +113,32 @@ public class PlayerAbility : MonoBehaviour
         }
     }
 
+    private void CheckHealth()
+    {
+        if (PlayerHP <= 0)
+        {
+            Destroy(gameObject);
+        }
+    }
+
     // Allows invincibilty frames to trigger
     IEnumerator DamageTimer()
     {
-        float cooldown = 4f;
+        float cooldown = 3f;
         iFrame = true;
-        transform.localScale = new Vector3(1f, 0.5f, 1f);
+
+        // Apply invincibility scale, preserving X direction
+        transform.localScale = new Vector3(transform.localScale.x, 0.5f, 1f);
+
         while (cooldown > 0)
         {
             cooldown -= 1f;
             yield return new WaitForSeconds(1f);
         }
         iFrame = false;
-        transform.localScale = new Vector3(1f, 1f, 1f);
+
+        // Restore scale, preserving X direction
+        transform.localScale = new Vector3(transform.localScale.x, 1f, 1f);
     }
 
     IEnumerator DashCooldown()
