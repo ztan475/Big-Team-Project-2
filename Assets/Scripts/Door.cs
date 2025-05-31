@@ -2,36 +2,56 @@ using UnityEngine;
 
 public class Door : MonoBehaviour
 {
-    public int requiredA = 3;
-    public int requiredB = 0;
-    public GameObject gameManager;
+    [SerializeField] private int requiredA;
+    [SerializeField] private int requiredB;
+    public Sprite openDoor;
+    public Gate exit;
 
     private bool isOpen = false;
+    private SpriteRenderer spriteRenderer;
+    private PlayerInventory inventory;
+    private GameObject player;
 
-    private void OnTriggerEnter(Collider other)
+    void Start()
     {
-        if(other.tag=="Player"){
-        Debug.Log("Player entered door range");
-        if (isOpen) return;
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        inventory = PlayerInventory.Instance;
+    }
 
-        PlayerInventory inventory = gameManager.GetComponent<PlayerInventory>();
-        if (inventory != null)
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.tag == "Player")
         {
-            if (inventory.TrySpendCollectibles(requiredA, requiredB))
+
+            if (player == null)
             {
-                OpenDoor();
+                player = other.gameObject;
             }
-            else
+
+            Debug.Log("Player entered door range");
+            // Teleport player only when open
+
+            if (inventory != null)
             {
-                Debug.Log("Not enough collectibles to open this door.");
+                if (inventory.TrySpendCollectibles(requiredA, requiredB))
+                {
+                    OpenDoor();
+                }
+                else
+                {
+                    Debug.Log("Not enough collectibles to open this door.");
+                }
             }
-        }
         }
     }
 
     private void OpenDoor()
     {
         isOpen = true;
-        gameObject.SetActive(false); // Or play an animation / move the door
+        if (openDoor != null)
+        {
+            spriteRenderer.sprite = openDoor;
+            exit.Teleport(player.transform);
+        }
     }
 }

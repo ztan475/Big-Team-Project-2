@@ -234,13 +234,19 @@ public bool wall;
         // Cut jump short when button is released (variable jump height)
         if (rb.velocity.y > 0 && Input.GetKeyUp(KeyCode.Space) && !onWall)
         {
+            StateCheck("Jumping");
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutMultiplier);
         }
 
-        // If velocity
-        if (rb.velocity.y < 0)
+        // Check vertical velocity while in air
+        if (rb.velocity.y < 0 && playerState != PlayerState.Falling && !onGround)
         {
             StateCheck("Falling");
+        }
+
+        if(rb.velocity.y > 0 && playerState != PlayerState.Jumping && !onGround)
+        {
+            StateCheck("Jumping");
         }
 
     }
@@ -294,7 +300,7 @@ public bool wall;
     IEnumerator WallJumpCooldown()
     {
        
-        float cooldown = 2f;
+        float cooldown = 1f;
         wallJumpCD = true;
         while (cooldown >  0) {
             cooldown -= 1f;
