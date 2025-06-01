@@ -299,13 +299,8 @@ public bool wall;
 
     IEnumerator WallJumpCooldown()
     {
-       
-        float cooldown = 1f;
         wallJumpCD = true;
-        while (cooldown >  0) {
-            cooldown -= 1f;
-            yield return new WaitForSeconds(1f);
-        }
+        yield return new WaitForSeconds(0.5f);
         wallJumpCD = false;
     }
 }

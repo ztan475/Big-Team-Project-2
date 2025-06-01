@@ -21,7 +21,6 @@ public class PlayerInventory : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         pickupAAmount = GameObject.Find("PickupAAmount").GetComponent<TextMeshProUGUI>();
         pickupBAmount = GameObject.Find("PickupBAmount").GetComponent<TextMeshProUGUI>();
