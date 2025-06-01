@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &6492452107650774187
+--- !u!1001 &2299500633171610620
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2505825294118717624, guid: be740f6bd8ceb2f4ca987746a3e4fbf8, type: 3}
       propertyPath: m_Name
-      value: Player Updated
+      value: Player Updated 1
       objectReference: {fileID: 0}
     - target: {fileID: 2576473115577527804, guid: be740f6bd8ceb2f4ca987746a3e4fbf8, type: 3}
       propertyPath: m_LocalPosition.x
